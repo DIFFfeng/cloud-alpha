@@ -31,7 +31,7 @@ public class OrderSerivceImpl implements OrderService {
 
     public Order createOrder(Long productId, Long userId) {
         // Product product = getProductFromRemote(productId);
-        Product product = getProductFromRemoteWithLoadBalancer(productId); // 使用负载均衡的远程调用版本
+        Product product = getProductFromRemoteWithLoadBalancerAnnotation(productId); // 使用注解-负载均衡的远程调用版本
         Order order = new Order();
 
         order.setId(0L);
@@ -71,6 +71,18 @@ public class OrderSerivceImpl implements OrderService {
         // http://localhost:9000~9002/product/2025 中间的服务支持负载均衡了（默认轮询
         String url = "http://" + choose.getHost() + ":" + choose.getPort() + "/product/" + productId;
         log.info("负载均衡的远程请求是：{}", url);
+
+        // 给远程发送请求 cloud提供 RestTemplate组件，很方便的提供请求 （是线程安全的，全局可只有一个，所以生成一个 配置类来注入使用）
+        Product rProduct = restTemplate.getForObject(url, Product.class);// 第二个参数就是 请求到的json自动转为这个 java Bean
+        return rProduct;
+    }
+
+    // 升级版本 3 ：基于 loadBalancer 注解自动在远程调用完成负载均衡 发送请求
+    public Product getProductFromRemoteWithLoadBalancerAnnotation(Long productId) {
+
+        // http://localhost:9000~9002/product/2025 注解支持 restTemplate 自动开启负载均衡了，中间 ip+端口 换为”服务名“就好
+        String url = "http://service-product/product/" + productId;
+        log.info("注解支持-负载均衡的远程请求是：{}", url);
 
         // 给远程发送请求 cloud提供 RestTemplate组件，很方便的提供请求 （是线程安全的，全局可只有一个，所以生成一个 配置类来注入使用）
         Product rProduct = restTemplate.getForObject(url, Product.class);// 第二个参数就是 请求到的json自动转为这个 java Bean
