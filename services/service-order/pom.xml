@@ -23,6 +23,16 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
         <!-- 这里父层 services pom有nacos的公共配置，这里不用写，直接继承 -->
+        <!-- 添加负载均衡依赖-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-loadbalancer</artifactId>
+        </dependency>
+        <!-- 引入测试包 试试上面这个 负载均衡-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -25,8 +26,12 @@ public class OrderSerivceImpl implements OrderService {
     @Autowired
     RestTemplate restTemplate;
 
+    @Autowired
+    LoadBalancerClient loadBalancerClient; // 使用 SpringCloud提供的负载均衡
+
     public Order createOrder(Long productId, Long userId) {
-        Product product = getProductFromRemote(productId);
+        // Product product = getProductFromRemote(productId);
+        Product product = getProductFromRemoteWithLoadBalancer(productId); // 使用负载均衡的远程调用版本
         Order order = new Order();
 
         order.setId(0L);
@@ -42,21 +47,34 @@ public class OrderSerivceImpl implements OrderService {
         return order;
     }
 
-    // 远程调用微服务 获得商品
+    // 默认版本 1： 远程调用微服务 获得商品 （无负载均衡
     public Product getProductFromRemote(Long productId) {
-        // 获取到 “商品服务" 所在机器IP+port
+        // 获取到 “商品服务" 所在机器IP+port  这个 discoveryClient.getInstances 是发现所有地址的
         List<ServiceInstance> instances = discoveryClient.getInstances("service-product");
 
         ServiceInstance instance = instances.get(0);
         // 拼接出远程的 URL地址， 通过它调用远程数据
         // http://localhost:9000/product/2025
         String url = "http://" + instance.getHost() + ":" + instance.getPort() + "/product/" + productId;
-        log.info("远程请求是：{}" , url);
+        log.info("远程请求是：{}", url);
 
         // 给远程发送请求 cloud提供 RestTemplate组件，很方便的提供请求 （是线程安全的，全局可只有一个，所以生成一个 配置类来注入使用）
         Product rProduct = restTemplate.getForObject(url, Product.class);// 第二个参数就是 请求到的json自动转为这个 java Bean
         return rProduct;
+    }
 
+    // 升级版本 2 ：完成负载均衡 发送请求
+    public Product getProductFromRemoteWithLoadBalancer(Long productId) {
+        // List<ServiceInstance> instances = discoveryClient.getInstances("service-product");
+        ServiceInstance choose = loadBalancerClient.choose("service-product");
+
+        // http://localhost:9000~9002/product/2025 中间的服务支持负载均衡了（默认轮询
+        String url = "http://" + choose.getHost() + ":" + choose.getPort() + "/product/" + productId;
+        log.info("负载均衡的远程请求是：{}", url);
+
+        // 给远程发送请求 cloud提供 RestTemplate组件，很方便的提供请求 （是线程安全的，全局可只有一个，所以生成一个 配置类来注入使用）
+        Product rProduct = restTemplate.getForObject(url, Product.class);// 第二个参数就是 请求到的json自动转为这个 java Bean
+        return rProduct;
     }
 
 
