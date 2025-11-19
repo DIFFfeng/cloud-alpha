@@ -1,0 +1,42 @@
+server:
+  port: 8000
+spring:
+  profiles:
+    active: dev
+    # todo 基于项目激活的 环境标识 -> 动态连上指定 名称空间， 动态加载指定文件
+  application:
+    name: service-order
+  cloud:
+    nacos:
+        server-addr: 127.0.0.1:8848
+        config:
+          namespace: ${spring.profiles.active:public} # 表示按照 profiles 动态切换,默认是 public
+          import-check:
+            enabled: false # 默认也要写导入，或者把导入检查禁用
+
+---
+spring:
+  config:
+    import:
+      - nacos:common.properties?group=order
+      - nacos:database.properties?group=order
+    activate:
+      on-profile: dev
+    # on-profile 表示在 dev 这个环境上面的配置生效（然后就可以通过控制 spring profiles: xxx 激活； 快速切换到不同环境的配置导入了
+---
+spring:
+  config:
+    import:
+      - nacos:common.properties?group=order
+      - nacos:database.properties?group=order
+      - nacos:mockhaha.properties?group=order
+    activate:
+      on-profile: test
+---
+spring:
+  config:
+    import:
+      - nacos:common.properties?group=order
+      - nacos:database.properties?group=order
+    activate:
+      on-profile: prod

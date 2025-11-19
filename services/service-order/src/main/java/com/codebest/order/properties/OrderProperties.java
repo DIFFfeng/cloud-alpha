@@ -12,4 +12,6 @@ public class OrderProperties {
     // String orderTimeout;
     String Timeout;
     String AutoConfirm;
+
+    String dbUrl; // 测试 nacos.config.namespace 的配置（数据隔离）
 }
