@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.codebest.order.bean.Order;
+import com.codebest.order.feign.ProductFeignClient;
 import com.codebest.order.service.OrderService;
 import com.codebest.product.bean.Product;
 import lombok.extern.slf4j.Slf4j;
@@ -29,9 +30,13 @@ public class OrderSerivceImpl implements OrderService {
     @Autowired
     LoadBalancerClient loadBalancerClient; // 使用 SpringCloud提供的负载均衡
 
+    @Autowired
+    ProductFeignClient productFeignClient;
+
     public Order createOrder(Long productId, Long userId) {
         // Product product = getProductFromRemote(productId);
-        Product product = getProductFromRemoteWithLoadBalancerAnnotation(productId); // 使用注解-负载均衡的远程调用版本
+        // Product product = getProductFromRemoteWithLoadBalancerAnnotation(productId); // 使用注解-负载均衡的远程调用版本
+        Product product = productFeignClient.getProductById(productId); // 使用 feign 发送
         Order order = new Order();
 
         order.setId(0L);
