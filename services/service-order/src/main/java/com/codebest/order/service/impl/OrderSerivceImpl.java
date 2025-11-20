@@ -66,6 +66,7 @@ public class OrderSerivceImpl implements OrderService {
     // 升级版本 2 ：完成负载均衡 发送请求
     public Product getProductFromRemoteWithLoadBalancer(Long productId) {
         // List<ServiceInstance> instances = discoveryClient.getInstances("service-product");
+        // 需要导入 spring-cloud-loadbalancer 依赖并注入即可用
         ServiceInstance choose = loadBalancerClient.choose("service-product");
 
         // http://localhost:9000~9002/product/2025 中间的服务支持负载均衡了（默认轮询

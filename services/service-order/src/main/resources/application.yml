@@ -40,3 +40,11 @@ spring:
       - nacos:database.properties?group=order
     activate:
       on-profile: prod
+---
+spring:
+  config:
+    import:
+      - nacos:common.properties?group=order
+      - nacos:database.properties?group=order
+    activate:
+      on-profile: default
