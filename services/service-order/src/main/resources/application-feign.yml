@@ -14,3 +14,6 @@ spring:
             read-timeout: 5000
 #            request-interceptors:
 #              - com.codebest.order.interceptor.XTokenRequestInterceptor  # 仅对客户端有效的拦截器，或者直接在这类上加 @component cloud能所有请求都自动识别的，并调用到拦截器
+feign:
+  sentinel:
+    enabled: true  # 这个功能开启，远程调用失败就会 走它兜底方法
