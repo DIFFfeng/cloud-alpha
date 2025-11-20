@@ -1,10 +1,13 @@
 package com.codebest.order.config;
 
 import feign.Logger;
+import feign.Retryer;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.concurrent.TimeUnit;
 
 @Configuration
 public class OrderConfig {
@@ -24,5 +27,12 @@ public class OrderConfig {
     @Bean
     Logger.Level feignLoggerLevel() {
         return Logger.Level.FULL;
+    }
+
+    // 开启 springCloud-openFeign 的重试机制
+    @Bean
+    Retryer retryer() {
+        return new Retryer.Default();
+        // 点击去可以看到 重试器默认实现 -> this(100L, TimeUnit.SECONDS.toMillis(1L), 5); 【 间隔100ms ，最大间隔1000ms,   最多重试5次 】
     }
 }

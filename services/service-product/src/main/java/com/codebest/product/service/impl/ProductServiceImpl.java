@@ -18,12 +18,12 @@ public class ProductServiceImpl implements ProductService {
         product.setProductName("苹果 - " + productId);
         product.setNum(2);
 
-        // 写个延时测试 openFeign的超时
-        try {
+        // 写个休眠测试 openFeign的超时
+        /* try {
             TimeUnit.SECONDS.sleep(6000);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
-        }
+        } */
 
 
         return product;
