@@ -2,8 +2,8 @@ server:
   port: 8000
 spring:
   profiles:
-    active: dev
-    # todo 基于项目激活的 环境标识 -> 动态连上指定 名称空间， 动态加载指定文件
+    active: dev # todo 基于项目激活的 环境标识 -> 动态连上指定 名称空间， 动态加载指定文件
+    include: feign  # 包含 application-feign.yml 管理它的配置
   application:
     name: service-order
   cloud:
@@ -13,6 +13,11 @@ spring:
           namespace: ${spring.profiles.active:public} # 表示按照 profiles 动态切换,默认是 public
           import-check:
             enabled: false # 默认也要写导入，或者把导入检查禁用
+
+# https://docs.spring.io/spring-cloud-openfeign/reference/spring-cloud-openfeign.html#feign-logging
+logging:
+  level:
+    com.codebest.order.feign: debug
 
 ---
 spring:

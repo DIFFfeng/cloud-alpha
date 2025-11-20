@@ -1,0 +1,14 @@
+spring:
+  cloud:
+    openfeign:
+      client:
+        config:
+          default: # 默认的服务用到 feign 的配置 【超时设置】
+            logger-level: full
+            connect-timeout: 2000 # 默认10 * 1000 毫秒
+            read-timeout: 3000 # 默认 60 * 1000 ms
+
+          service-product: # 具体服务名
+            logger-level: full
+            connect-timeout: 3000
+            read-timeout: 5000
